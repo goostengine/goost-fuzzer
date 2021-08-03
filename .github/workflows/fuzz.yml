@@ -1,4 +1,4 @@
-name: Fuzz
+name: 🐛 Fuzz
 on: 
   push:
   pull_request:
@@ -20,12 +20,13 @@ jobs:
         with:
           repository: goostengine/goost
           submodules: recursive
+          path: goost
           ref: gd3
 
       - uses: actions/checkout@v2
         with:
           repository: qarmin/Qarminer
-          path: fuzzer
+          path: goost/fuzzer
 
       - name: Configure dependencies
         run: |
@@ -60,9 +61,12 @@ jobs:
         env:
           SCONS_CACHE: ${{github.workspace}}/.scons_cache/
         run: |
+          pushd goost
           scons platform=linuxbsd
 
       - name: Run fuzzer project
         run: |
-          DRI_PRIME=0 xvfb-run ./godot/bin/godot.x11.tools.64.goosts FunctionExecutor.tscn 3600 --audio-driver Dummy --video-driver GLES3 --path $(pwd)/fuzzer 2>&1 | tee sanitizers_log.txt || true
+          pushd goost/godot/bin
+          DRI_PRIME=0 xvfb-run ./godot.x11.tools.64.goosts FunctionExecutor.tscn 3600 --audio-driver Dummy --video-driver GLES3 --path $GITHUB_WORKSPACE/fuzzer 2>&1 | tee sanitizers_log.txt || true
+          popd
           fuzzer/misc/check_ci_log.py sanitizers_log.txt
