@@ -1,0 +1,68 @@
+name: Fuzz
+on: 
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+env:
+  GOOST_BASE_BRANCH: gd3
+  SCONSFLAGS: tools=yes target=debug verbose=yes warnings=all debug_symbols=yes use_asan=yes use_lsan=yes use_ubsan=yes --jobs=4
+  SCONS_CACHE_LIMIT: 8192
+
+jobs:
+  linux:
+    runs-on: "ubuntu-20.04"
+    name: Linux Fuzzer
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: goostengine/goost
+          submodules: recursive
+          ref: gd3
+
+      - uses: actions/checkout@v2
+        with:
+          repository: qarmin/Qarminer
+          path: fuzzer
+
+      - name: Configure dependencies
+        run: |
+          sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev \
+            libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
+
+      - name: Load .scons_cache directory
+        id: linux-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.scons_cache/
+          key: ${{github.job}}-${{env.GOOST_BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+          restore-keys: |
+            ${{github.job}}-${{env.GOOST_BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+            ${{github.job}}-${{env.GOOST_BASE_BRANCH}}-${{github.ref}}
+            ${{github.job}}-${{env.GOOST_BASE_BRANCH}}
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons
+          python --version
+          scons --version
+
+      - name: Compilation
+        env:
+          SCONS_CACHE: ${{github.workspace}}/.scons_cache/
+        run: |
+          scons platform=linuxbsd
+
+      - name: Run fuzzer project
+        run: |
+          DRI_PRIME=0 xvfb-run ./godot/bin/godot.x11.tools.64.goosts FunctionExecutor.tscn 3600 --audio-driver Dummy --video-driver GLES3 --path $(pwd)/fuzzer 2>&1 | tee sanitizers_log.txt || true
+          fuzzer/misc/check_ci_log.py sanitizers_log.txt
