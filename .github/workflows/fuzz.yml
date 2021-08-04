@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: qarmin/Qarminer
-          path: goost/fuzzer
+          path: fuzzer
 
       - name: Configure dependencies
         run: |
@@ -58,15 +58,18 @@ jobs:
           scons --version
 
       - name: Compilation
+        working-directory: goost
         env:
           SCONS_CACHE: ${{github.workspace}}/.scons_cache/
         run: |
-          pushd goost
           scons platform=linuxbsd
 
-      - name: Run fuzzer project
+      - name: Run fuzzer
+        working-directory: goost/godot/bin
         run: |
-          pushd goost/godot/bin
           DRI_PRIME=0 xvfb-run ./godot.x11.tools.64.goosts FunctionExecutor.tscn 3600 --audio-driver Dummy --video-driver GLES3 --path $GITHUB_WORKSPACE/fuzzer 2>&1 | tee sanitizers_log.txt || true
-          popd
-          fuzzer/misc/check_ci_log.py sanitizers_log.txt
+
+      - name: Check fuzzer output
+        working-directory: fuzzer
+        run: |
+          misc/check_ci_log.py $GITHUB_WORKSPACE/goost/godot/bin/sanitizers_log.txt
