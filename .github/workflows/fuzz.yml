@@ -7,7 +7,7 @@ on:
 
 env:
   GOOST_BASE_BRANCH: gd3
-  SCONSFLAGS: tools=yes target=debug verbose=yes warnings=all debug_symbols=yes use_asan=yes use_lsan=yes use_ubsan=yes --jobs=4
+  SCONSFLAGS: godot_modules_enabled=no tools=yes target=debug verbose=yes debug_symbols=yes use_asan=yes use_lsan=yes use_ubsan=yes --jobs=4
   SCONS_CACHE_LIMIT: 8192
 
 jobs:
