@@ -25,8 +25,9 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          repository: qarmin/Qarminer
+          repository: goostengine/Qarminer
           path: fuzzer
+          ref: goost-gd3
 
       - name: Configure dependencies
         run: |
@@ -67,7 +68,7 @@ jobs:
       - name: Run fuzzer
         working-directory: goost/godot/bin
         run: |
-          DRI_PRIME=0 xvfb-run ./godot.x11.tools.64.goosts FunctionExecutor.tscn 3600 --audio-driver Dummy --video-driver GLES3 --path $GITHUB_WORKSPACE/fuzzer 2>&1 | tee sanitizers_log.txt || true
+          DRI_PRIME=0 xvfb-run ./godot.x11.tools.64.goosts FunctionExecutor.tscn 600 --audio-driver Dummy --video-driver GLES3 --path $GITHUB_WORKSPACE/fuzzer 2>&1 | tee sanitizers_log.txt || true
 
       - name: Check fuzzer output
         working-directory: fuzzer
