@@ -16,18 +16,23 @@ jobs:
     name: Linux Fuzzer
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Goost fuzzer
+        uses: actions/checkout@v2
+
+      - name: Checkout Goost
+        uses: actions/checkout@v2
         with:
           repository: goostengine/goost
           submodules: recursive
           path: goost
-          ref: gd3
+          ref: ${{env.GOOST_BASE_BRANCH}}
 
-      - uses: actions/checkout@v2
+      - name: Checkout Goost fuzzer backend
+        uses: actions/checkout@v2
         with:
           repository: goostengine/Qarminer
           path: fuzzer
-          ref: goost-gd3
+          ref: goost-${{env.GOOST_BASE_BRANCH}}
 
       - name: Configure dependencies
         run: |
