@@ -67,7 +67,7 @@ jobs:
 
       - name: Generate class list to fuzz
         run: |
-          generate_class_list.py
+          ./generate_class_list.py
 
       - name: Run fuzzer
         working-directory: goost/godot/bin
