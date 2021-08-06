@@ -17,6 +17,9 @@ from goost import classes
 
 with open("fuzzer/classes.txt", "w") as f:
     for name in classes:
+        if name == "ImageBlender":
+            # TODO: infinite loop: https://github.com/goostengine/goost/issues/120
+            continue
         f.write(name + "\n")
 
 sys.path.remove("goost")
