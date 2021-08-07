@@ -30,7 +30,7 @@ jobs:
       - name: Checkout Goost fuzzer backend
         uses: actions/checkout@v2
         with:
-          repository: goostengine/Qarminer
+          repository: qarmin/Qarminer
           path: fuzzer
           ref: goost-${{env.GOOST_BASE_BRANCH}}
 
