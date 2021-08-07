@@ -32,7 +32,6 @@ jobs:
         with:
           repository: qarmin/Qarminer
           path: fuzzer
-          ref: goost-${{env.GOOST_BASE_BRANCH}}
 
       - name: Configure dependencies
         run: |
