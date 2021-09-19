@@ -83,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: last-run-results
-          path: results.txt
+          path: fuzzer/results.txt
 
       - name: Check fuzzer output
         working-directory: fuzzer
