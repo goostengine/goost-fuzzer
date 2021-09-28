@@ -78,6 +78,13 @@ jobs:
         working-directory: goost/godot/bin
         run: |
           DRI_PRIME=0 xvfb-run ./godot.x11.tools.64.goosts FunctionExecutor.tscn 300 --audio-driver Dummy --video-driver GLES3 --path $GITHUB_WORKSPACE/fuzzer 2>&1 | tee sanitizers_log.txt || true
+          tail -n 300 sanitizers_log.txt > $GITHUB_WORKSPACE/fuzzer/project_results.txt
+
+      - name: Store project results
+        uses: actions/upload-artifact@v2
+        with:
+          name: project-results
+          path: fuzzer/project_results.txt
 
       - name: Store test results
         uses: actions/upload-artifact@v2
