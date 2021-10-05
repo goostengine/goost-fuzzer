@@ -33,6 +33,12 @@ jobs:
           repository: qarmin/Qarminer
           path: fuzzer
 
+      # Some methods return valid Object(s) in Goost, prevent memory leaks.
+      - name: Configure fuzzer
+        working-directory: fuzzer
+        run: |
+          sed -i 's/var remove_returned_value: bool = false/var remove_returned_value: bool = true/' FunctionExecutor.gd
+
       - name: Configure dependencies
         run: |
           sudo apt-get update
